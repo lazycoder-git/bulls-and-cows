@@ -12,11 +12,8 @@ build/
 # ── Environment files — NEVER commit real secrets ─────────────────────────
 .env
 .env.*
-!.env.example       # keep the safe template
-.env.local
-.env.development
-.env.production
-.env.test
+!.env.example
+!**/.env.example
 
 # ── OS junk ───────────────────────────────────────────────────────────────
 .DS_Store
