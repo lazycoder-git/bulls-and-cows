@@ -1,0 +1,7 @@
+{
+  "version": 2,
+  "framework": "nextjs",
+  "installCommand": "pnpm install --frozen-lockfile",
+  "buildCommand": "pnpm --filter @traffic/server exec prisma generate && pnpm --filter @traffic/web build",
+  "outputDirectory": "apps/web/.next"
+}

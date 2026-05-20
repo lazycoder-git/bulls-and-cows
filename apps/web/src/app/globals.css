@@ -1,0 +1,199 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@700;800;900&display=swap');
+@import "tailwindcss";
+
+/* ── Reset ─────────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+
+/* ── Chess.com-inspired Design Token System ─────────────────────────────────── */
+:root {
+  /* Warm charcoal palette — like chess.com */
+  --bg-base:        #1a1a1a;   /* Page background */
+  --bg-sidebar:     #262421;   /* Sidebar — warm dark brown */
+  --bg-panel:       #2c2b29;   /* Card/panel surface */
+  --bg-panel-hover: #333230;   /* Card hover */
+  --bg-panel-alt:   #302f2d;   /* Secondary panel */
+  --bg-input:       #1f1e1c;   /* Input backgrounds */
+
+  /* Text */
+  --text-primary:   #ffffff;
+  --text-secondary: #b0a999;   /* Warm grey — chess.com secondary */
+  --text-muted:     #787672;   /* Muted labels */
+
+  /* Borders */
+  --border:         rgba(255,255,255,0.07);
+  --border-strong:  rgba(255,255,255,0.12);
+
+  /* Accent — chess.com green for primary actions */
+  --accent-green:   #81b64c;
+  --accent-green-hover: #8dc455;
+  --accent-green-dark:  #6a9940;
+
+  /* Secondary accent for BnC branding */
+  --accent-blue:    #5d8ef0;
+  --accent-purple:  #7c5cbf;
+
+  /* Game colors */
+  --bull-color:     #e05252;   /* Red for Bulls */
+  --cow-color:      #e0a752;   /* Amber for Cows */
+  --error:          #e05252;
+
+  /* Radius */
+  --radius-sm:  4px;
+  --radius-md:  6px;
+  --radius-lg:  8px;
+  --radius-xl:  12px;
+}
+
+/* ── Base ───────────────────────────────────────────────────────────────────── */
+html { background: var(--bg-base); color-scheme: dark; }
+body {
+  background: var(--bg-base);
+  color: var(--text-primary);
+  min-height: 100vh;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ── Panel (replaces glassmorphism) ─────────────────────────────────────────── */
+.panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+.panel-alt {
+  background: var(--bg-panel-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+/* Kept for backwards compatibility */
+.glass {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+/* ── Gradient text ───────────────────────────────────────────────────────────── */
+.gradient-text {
+  background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-purple) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  transition: background 0.12s ease, transform 0.1s ease, box-shadow 0.12s ease;
+  user-select: none;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+}
+.btn:active { transform: scale(0.975); }
+
+/* Green CTA — chess.com style primary */
+.btn-primary {
+  background: var(--accent-green);
+  color: #1a1a13;
+  font-weight: 800;
+  box-shadow: 0 2px 8px rgba(129, 182, 76, 0.25);
+}
+.btn-primary:hover {
+  background: var(--accent-green-hover);
+  box-shadow: 0 4px 14px rgba(129, 182, 76, 0.35);
+  transform: translateY(-1px);
+}
+
+/* Ghost secondary */
+.btn-outline {
+  background: var(--bg-panel-alt);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-strong);
+}
+.btn-outline:hover {
+  background: var(--bg-panel-hover);
+  color: var(--text-primary);
+  border-color: rgba(255,255,255,0.2);
+}
+
+/* Blue variant */
+.btn-blue {
+  background: var(--accent-blue);
+  color: white;
+  font-weight: 700;
+}
+.btn-blue:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+/* ── Input ───────────────────────────────────────────────────────────────────── */
+.input-base {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  outline: none;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 0.15s;
+}
+.input-base::placeholder { color: var(--text-muted); }
+.input-base:focus { border-color: var(--accent-green); }
+
+/* ── Tabs ────────────────────────────────────────────────────────────────────── */
+.tab-bar {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  gap: 0;
+}
+.tab {
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.12s, border-color 0.12s;
+  user-select: none;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.tab:hover { color: var(--text-primary); }
+.tab.active {
+  color: var(--text-primary);
+  border-bottom-color: var(--accent-green);
+}
+
+/* ── Utilities ───────────────────────────────────────────────────────────────── */
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ── Animations ──────────────────────────────────────────────────────────────── */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+.animate-float { animation: float 5s ease-in-out infinite; }
+
+/* ── Scrollbar ───────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.18); }

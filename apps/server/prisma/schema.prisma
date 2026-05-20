@@ -1,0 +1,225 @@
+// This is your Prisma schema file
+// Run: pnpm prisma db push
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  username      String?   @unique
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  avatar        String?   // Alias for image or separate field
+  passwordHash  String?   // Keep for local auth if needed, but NextAuth primarily handles OAuth
+  rating        Int       @default(1200)
+  gamesPlayed   Int       @default(0)
+  wins          Int       @default(0)
+  losses        Int       @default(0)
+  draws         Int       @default(0)
+  dailyStreak   Int       @default(0)
+  bestStreak    Int       @default(0)
+  lastSeen      DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // NextAuth Relations
+  accounts      Account[]
+  sessions      Session[]
+
+  // Game Relations
+  gamesAsPlayer1  Game[]          @relation("Player1Game")
+  gamesAsPlayer2  Game[]          @relation("Player2Game")
+  moves           Move[]
+  puzzleSolves    PuzzleSolve[]
+  activityLogs    ActivityLog[]
+  ratingHistory   RatingHistory[]
+  tournaments     TournamentParticipant[]
+
+  @@map("users")
+}
+
+// NextAuth Required Models
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Game {
+  id           String     @id @default(cuid())
+  mode         String     // solo | multiplayer | puzzle_daily | tournament
+  status       String     @default("waiting") // waiting | active | finished | abandoned
+  secretNumber String
+  hostId       String?
+  guestId      String?
+  winnerId     String?
+  roomCode     String?    @unique
+  isRated      Boolean    @default(false)
+  turnCount    Int        @default(0)
+  startedAt    DateTime?
+  finishedAt   DateTime?
+  createdAt    DateTime   @default(now())
+
+  host   User?  @relation("Player1Game",  fields: [hostId],   references: [id])
+  guest  User?  @relation("Player2Game", fields: [guestId],  references: [id])
+  moves  Move[]
+  tournamentMatch TournamentMatch?
+
+  @@index([status])
+  @@index([roomCode])
+  @@index([hostId])
+  @@index([guestId])
+  @@map("games")
+}
+
+model Move {
+  id          String   @id @default(cuid())
+  gameId      String
+  playerId    String
+  guess       String
+  bulls       Int
+  cows        Int
+  turnNumber  Int
+  createdAt   DateTime @default(now())
+
+  game   Game @relation(fields: [gameId],   references: [id], onDelete: Cascade)
+  player User @relation(fields: [playerId], references: [id])
+
+  @@index([gameId])
+  @@index([playerId])
+  @@map("moves")
+}
+
+model DailyPuzzle {
+  id           String   @id @default(cuid())
+  date         String   @unique // YYYY-MM-DD
+  secretNumber String
+  totalSolves  Int      @default(0)
+  totalTries   Int      @default(0)
+  createdAt    DateTime @default(now())
+
+  solves PuzzleSolve[]
+
+  @@index([date])
+  @@map("daily_puzzles")
+}
+
+model PuzzleSolve {
+  id        String   @id @default(cuid())
+  userId    String
+  puzzleId  String
+  attempts  Int
+  solved    Boolean  @default(true)
+  timeTaken Int?     // seconds
+  createdAt DateTime @default(now())
+
+  user   User        @relation(fields: [userId], references: [id])
+  puzzle DailyPuzzle @relation(fields: [puzzleId], references: [id])
+
+  @@unique([userId, puzzleId])
+  @@index([userId])
+  @@map("puzzle_solves")
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  type      String   // game_start | game_end | user_join | user_login | puzzle_solve | room_create
+  userId    String?
+  details   String
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([type])
+  @@index([createdAt])
+  @@index([userId])
+  @@map("activity_logs")
+}
+
+model Tournament {
+  id          String   @id @default(cuid())
+  name        String
+  status      String   @default("pending") // pending | active | completed
+  format      String   @default("round-robin")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  participants TournamentParticipant[]
+  matches      TournamentMatch[]
+}
+
+model TournamentParticipant {
+  id           String   @id @default(cuid())
+  tournamentId String
+  userId       String
+  score        Int      @default(0)
+  
+  tournament Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id])
+
+  @@unique([tournamentId, userId])
+}
+
+model TournamentMatch {
+  id           String   @id @default(cuid())
+  tournamentId String
+  gameId       String   @unique
+  round        Int
+  
+  tournament Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  game       Game       @relation(fields: [gameId], references: [id])
+}
+
+model RatingHistory {
+  id        String   @id @default(cuid())
+  userId    String
+  rating    Int
+  delta     Int
+  gameId    String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("rating_history")
+}

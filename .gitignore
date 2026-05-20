@@ -1,0 +1,46 @@
+node_modules
+.next
+dist
+.turbo
+*.log
+
+# ── Build outputs ──────────────────────────────────────────────────────────
+out/
+build/
+.cache/
+
+# ── Environment files — NEVER commit real secrets ─────────────────────────
+.env
+.env.*
+!.env.example       # keep the safe template
+.env.local
+.env.development
+.env.production
+.env.test
+
+# ── OS junk ───────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Editor ────────────────────────────────────────────────────────────────
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# ── Prisma ────────────────────────────────────────────────────────────────
+prisma/migrations
+*.db
+*.db-journal
+dev.db
+
+# ── TypeScript build info ─────────────────────────────────────────────────
+*.tsbuildinfo
+
+# ── Misc generated/debug files ────────────────────────────────────────────
+apps/server/tsc_errors.txt
+apps/server/tsc_errors_new.txt
+apps/server/prisma_gen.txt
+apps/web/build_error.txt
+help.txt

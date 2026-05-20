@@ -1,0 +1,427 @@
+/* ══════════════════════════════════════════════════════════
+   BnC Sidebar — Chess.com-inspired with premium hover effects
+   ══════════════════════════════════════════════════════════ */
+
+/* ── Shell ── */
+.bnc-sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 160px;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  background: #262421;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+/* ── Logo ── */
+.bnc-sidebar__logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  height: 60px;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+  transition: background 0.18s ease;
+  position: relative;
+  overflow: hidden;
+}
+.bnc-sidebar__logo:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+.bnc-sidebar__logo-img {
+  border-radius: 6px;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+.bnc-sidebar__logo:hover .bnc-sidebar__logo-img {
+  transform: rotate(-6deg) scale(1.08);
+}
+.bnc-sidebar__logo-text {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: white;
+  font-family: 'Outfit', sans-serif;
+  letter-spacing: -0.02em;
+}
+.bnc-sidebar__logo-accent {
+  background: linear-gradient(135deg, #81b64c, #5fb840);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Nav ── */
+.bnc-sidebar__nav {
+  flex: 1;
+  padding: 8px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* ── Nav Item ── */
+.bnc-sidebar__item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  height: 44px;
+  text-decoration: none;
+  color: #7a7570;
+  font-size: 13.5px;
+  font-weight: 500;
+  transition:
+    color 0.12s ease,
+    background 0.12s ease;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+/* Hover state */
+.bnc-sidebar__item:hover {
+  color: #d4cfc9;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* Active state */
+.bnc-sidebar__item--active {
+  color: #ffffff;
+  font-weight: 700;
+  background: rgba(129, 182, 76, 0.1);
+}
+.bnc-sidebar__item--active:hover {
+  background: rgba(129, 182, 76, 0.14);
+}
+
+/* ── Left accent bar ── */
+.bnc-sidebar__accent-bar {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%) scaleY(0);
+  width: 3px;
+  height: 65%;
+  background: #81b64c;
+  border-radius: 0 2px 2px 0;
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-origin: center;
+}
+.bnc-sidebar__item:hover .bnc-sidebar__accent-bar,
+.bnc-sidebar__item--active .bnc-sidebar__accent-bar {
+  transform: translateY(-50%) scaleY(1);
+}
+
+/* ── Icon ── */
+.bnc-sidebar__icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  transition:
+    color 0.15s ease,
+    filter 0.15s ease,
+    transform 0.18s ease;
+  opacity: 0.65;
+}
+.bnc-sidebar__item:hover .bnc-sidebar__icon,
+.bnc-sidebar__item--active .bnc-sidebar__icon {
+  opacity: 1;
+  color: #81b64c;
+  filter: drop-shadow(0 0 5px rgba(129, 182, 76, 0.55));
+  transform: scale(1.1);
+}
+
+/* ── Label group ── */
+.bnc-sidebar__label-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+.bnc-sidebar__label {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: transform 0.15s ease;
+}
+.bnc-sidebar__item:hover .bnc-sidebar__label {
+  transform: translateY(-1px);
+}
+.bnc-sidebar__desc {
+  display: block;
+  font-size: 10px;
+  color: #595653;
+  font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(3px);
+  transition:
+    opacity 0.12s ease,
+    transform 0.12s ease;
+  line-height: 1;
+  height: 0;
+}
+.bnc-sidebar__item:hover .bnc-sidebar__desc {
+  opacity: 1;
+  transform: translateY(0);
+  height: auto;
+}
+
+/* ── Shimmer sweep on hover ── */
+.bnc-sidebar__shimmer {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.035) 50%,
+    transparent 100%
+  );
+  skewX: -20deg;
+  pointer-events: none;
+  transition: left 0s;
+}
+.bnc-sidebar__item:hover .bnc-sidebar__shimmer,
+.bnc-sidebar__item--open .bnc-sidebar__shimmer {
+  left: 160%;
+  transition: left 0.45s ease;
+}
+
+/* ── Item wrapper (positions flyout relative to item) ── */
+.bnc-sidebar__item-wrapper {
+  position: relative;
+}
+
+/* ── Open state for the nav item ── */
+.bnc-sidebar__item--open {
+  color: #d4cfc9;
+  background: rgba(255, 255, 255, 0.06) !important;
+}
+.bnc-sidebar__item--open .bnc-sidebar__icon {
+  opacity: 1;
+  color: #81b64c;
+  filter: drop-shadow(0 0 5px rgba(129, 182, 76, 0.55));
+  transform: scale(1.1);
+}
+.bnc-sidebar__item--open .bnc-sidebar__accent-bar {
+  transform: translateY(-50%) scaleY(1);
+}
+
+/* ── Flyout panel ── */
+.bnc-flyout {
+  position: fixed;
+  left: 160px; /* width of sidebar */
+  /* top set via JS — using CSS var */
+  z-index: 200;
+  width: 220px;
+  background: #1e1c1a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-left: 2px solid #81b64c;
+  border-radius: 0 10px 10px 0;
+  box-shadow:
+    4px 0 24px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  padding: 6px 0 8px;
+  pointer-events: none;
+
+  /* Hidden state */
+  opacity: 0;
+  transform: translateX(-6px);
+  transition:
+    opacity 0.13s ease,
+    transform 0.13s ease;
+}
+
+.bnc-flyout--visible {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+/* ── Flyout header ── */
+.bnc-flyout__header {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px 8px;
+  font-size: 10px;
+  font-weight: 800;
+  color: #81b64c;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 4px;
+}
+
+/* ── Flyout sub-item ── */
+.bnc-flyout__item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  padding: 9px 14px;
+  border: none;
+  background: none;
+  color: #b0a999;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    background 0.1s ease,
+    color 0.1s ease;
+  border-left: 2px solid transparent;
+}
+.bnc-flyout__item:hover {
+  background: rgba(129, 182, 76, 0.08);
+  color: #ffffff;
+  border-left-color: #81b64c;
+}
+.bnc-flyout__item:hover .bnc-flyout__item-icon {
+  color: #81b64c;
+}
+
+.bnc-flyout__item-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  color: #595653;
+  transition: color 0.1s ease;
+}
+
+.bnc-flyout__item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.bnc-flyout__item-name {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.bnc-flyout__item-desc {
+  font-size: 10.5px;
+  color: #595653;
+  font-weight: 400;
+  line-height: 1.3;
+}
+.bnc-flyout__item:hover .bnc-flyout__item-desc {
+  color: #7a7570;
+}
+
+/* ── Profile link (signed-in state) ── */
+.bnc-sidebar__profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin: 4px 8px;
+  text-decoration: none;
+  color: #b0a999;
+  transition: background 0.12s ease, color 0.12s ease;
+  cursor: pointer;
+}
+.bnc-sidebar__profile:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+.bnc-sidebar__avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  color: white;
+  border: 2px solid rgba(129, 182, 76, 0.35);
+  overflow: hidden;
+}
+
+/* ── Bottom section ── */
+.bnc-sidebar__bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 8px 0;
+  flex-shrink: 0;
+}
+
+.bnc-sidebar__auth {
+  padding: 8px 12px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ── Auth buttons ── */
+.bnc-sidebar__btn-signup {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 34px;
+  background: #81b64c;
+  color: #1a1a13;
+  font-weight: 800;
+  font-size: 13px;
+  border-radius: 6px;
+  text-decoration: none;
+  transition:
+    background 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.12s ease;
+  position: relative;
+  overflow: hidden;
+}
+.bnc-sidebar__btn-signup:hover {
+  background: #8dc455;
+  box-shadow: 0 3px 12px rgba(129, 182, 76, 0.4);
+  transform: translateY(-1px);
+}
+.bnc-sidebar__btn-signup:active {
+  transform: translateY(0);
+}
+
+.bnc-sidebar__btn-login {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 34px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #d4cfc9;
+  font-weight: 600;
+  font-size: 13px;
+  border-radius: 6px;
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    transform 0.12s ease;
+}
+.bnc-sidebar__btn-login:hover {
+  background: rgba(255, 255, 255, 0.11);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+.bnc-sidebar__btn-login:active {
+  transform: translateY(0);
+}

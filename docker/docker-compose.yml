@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: ..
+      dockerfile: docker/web.Dockerfile
+    container_name: bnc-web
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_WS_URL=http://localhost:4000
+    depends_on:
+      - server
+    networks:
+      - bnc-network
+    restart: unless-stopped
+
+  server:
+    build:
+      context: ..
+      dockerfile: docker/server.Dockerfile
+    container_name: bnc-server
+    ports:
+      - "4000:4000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/bnc?schema=public
+      - DIRECT_URL=postgresql://postgres:postgres@postgres:5432/bnc
+      - REDIS_URL=redis://redis:6379/0
+      - JWT_SECRET=super_secret_jwt_key_override_in_prod
+      - FRONTEND_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=super_secret_nextauth_signing_key
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - bnc-network
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: bnc-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=bnc
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - bnc-network
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: bnc-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    networks:
+      - bnc-network
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  redisdata:
+
+networks:
+  bnc-network:
+    driver: bridge
