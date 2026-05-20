@@ -5,9 +5,9 @@ WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@10.33.0 --activate
 RUN npm install -g turbo
 COPY . .
-RUN turbo prune --scope=@traffic/web --scope=@traffic/server --docker
+RUN turbo prune --scope=@traffic/web --docker
 
-# Stage 2: Install dependencies
+# Stage 2: Install & Build
 FROM node:20-alpine AS installer
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
@@ -19,16 +19,9 @@ COPY --from=pruner /app/out/json/ .
 COPY --from=pruner /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 RUN pnpm install --frozen-lockfile
 
-# Build project
 COPY --from=pruner /app/out/full/ .
 COPY turbo.json turbo.json
-# Generate Prisma client (web uses PrismaAdapter which requires @prisma/client types)
-# DATABASE_URL is required by prisma generate for schema parsing — not a live DB in build
-ARG DATABASE_URL=postgresql://placeholder:placeholder@localhost:5432/placeholder
-ENV DATABASE_URL=$DATABASE_URL
-RUN pnpm --filter @traffic/server exec prisma generate
 
-# Build project
 RUN pnpm turbo run build --filter=@traffic/web
 
 # Stage 3: Runner
